@@ -1,0 +1,9 @@
+{
+"title":"App Name Goes Here",
+"icon":"icon.png",
+"toc":[
+	{"title":"Chapter 1","url":"chapter1.html"},
+	{"title":"Chapter 2","url":"chapter2.html"},
+	{"title":"Chapter 3","url":"chapter3.html"}
+	]
+}
