@@ -8,22 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.webkit.WebView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +23,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.flContent, new ContentFragment()).commit();
+        }
 
         // Set a Toolbar to replace the ActionBar.
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -52,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
         nvDrawer = (NavigationView) findViewById(R.id.nvView);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
-
-        // Inflate the header view at runtime
-        View headerLayout = nvDrawer.inflateHeaderView(R.layout.nav_header);
-        //headerLayout = nvDrawer.getHeaderView(0);
     }
 
     @Override
@@ -109,16 +96,16 @@ public class MainActivity extends AppCompatActivity {
         Class fragmentClass;
         switch(menuItem.getItemId()) {
             case R.id.nav_first_fragment:
-                fragmentClass = Fragment.class;
+                fragmentClass = ContentFragment.class;
                 break;
             case R.id.nav_second_fragment:
-                fragmentClass = Fragment.class;
+                fragmentClass = ContentFragment.class;
                 break;
             case R.id.nav_third_fragment:
-                fragmentClass = Fragment.class;
+                fragmentClass = ContentFragment.class;
                 break;
             default:
-                fragmentClass = Fragment.class;
+                fragmentClass = ContentFragment.class;
         }
 
         try {
@@ -137,10 +124,6 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.closeDrawers();
     }
 
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
     public static class PlaceholderFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
@@ -161,58 +144,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            WebView view = (WebView) rootView.findViewById(R.id.webView);
-            view.getSettings().setJavaScriptEnabled(true);
-
-            try {
-                JSONObject obj = new JSONObject(loadJSONFromAsset());
-                JSONArray m_jArry = obj.getJSONArray("toc");
-                ArrayList<HashMap<String, String>> formList = new ArrayList<HashMap<String, String>>();
-                HashMap<String, String> list;
-
-                for (int i = 0; i < m_jArry.length(); i++) {
-                    JSONObject jsonObject = m_jArry.getJSONObject(i);
-                    String chapter_value = jsonObject.getString("title");
-                    String url_value = jsonObject.getString("url");
-
-                    list = new HashMap<String, String>();
-                    list.put("title", chapter_value);
-                    list.put("url", url_value);
-
-                    Log.d("Details-->", jsonObject.getString("url"));
-
-                    formList.add(list);
-
-                    view.loadUrl("file:///android_asset/" + url_value);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return rootView;
-        }
-
-        public String loadJSONFromAsset() {
-            String json = null;
-            try {
-                InputStream is = getActivity().getAssets().open("book.json");
-                int size = is.available();
-                byte[] buffer = new byte[size];
-                is.read(buffer);
-                is.close();
-                json = new String(buffer, "UTF-8");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                return null;
-            }
-            return json;
         }
 
     }
