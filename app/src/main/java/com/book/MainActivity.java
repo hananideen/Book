@@ -1,6 +1,7 @@
 package com.book;
 
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,8 +9,19 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -18,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
+    private TextView tvName;
+    private ImageView ivIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +50,16 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.setDrawerListener(drawerToggle);
 
         nvDrawer = (NavigationView) findViewById(R.id.nvView);
-        nvDrawer.inflateHeaderView(R.layout.nav_header2);
         setupDrawerContent(nvDrawer);
+
+        View header = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
+        nvDrawer.addHeaderView(header);
+
+        tvName = (TextView) header.findViewById(R.id.tvName);
+        ivIcon = (ImageView) header.findViewById(R.id.ivIcon);
+        nvDrawer.inflateHeaderView(R.layout.nav_header2);
+
+        loadData();
     }
 
     @Override
@@ -114,28 +136,42 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.closeDrawers();
     }
 
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+    public void loadData() {
+        try {
+            JSONObject obj = new JSONObject(loadJSONFromAsset());
+            String appName = obj.getString("title");
+            String icon = obj.getString("icon");
+            Log.d("json object: ", appName +", " +icon);
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
+            tvName.setText(appName);
+            try {
+                InputStream ims = getAssets().open(icon);
+                Drawable d = Drawable.createFromStream(ims, null);
+                ivIcon.setImageDrawable(d);
+            }
+            catch(IOException ex) {
+                return;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+    }
 
-        public PlaceholderFragment() {
+    public String loadJSONFromAsset() {
+        String json = null;
+        try {
+            InputStream is = getAssets().open("book.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
         }
-
+        return json;
     }
 
 }

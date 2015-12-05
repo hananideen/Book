@@ -8,14 +8,15 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/ivIcon"
         android:src="@mipmap/ic_launcher"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/tvName"
         android:text="Header"
         android:textColor="@android:color/white"
         android:textSize="18sp"
