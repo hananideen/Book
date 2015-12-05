@@ -2,20 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-
-        <item android:title="Table of Contents">
-            <menu>
-                <item
-                    android:id="@+id/nav_first_fragment"
-                    android:checked="true"
-                    android:title="Sub item 1" />
-                <item
-                    android:id="@+id/nav_second_fragment"
-                    android:title="Sub item 2" />
-                <item
-                    android:id="@+id/nav_third_fragment"
-                    android:title="Sub item 3" />
-            </menu>
-        </item>
+        <item
+            android:id="@+id/nav_first_fragment"
+            android:title="First" />
+        <item
+            android:id="@+id/nav_second_fragment"
+            android:title="Second" />
+        <item
+            android:id="@+id/nav_third_fragment"
+            android:title="Third" />
     </group>
 </menu>
