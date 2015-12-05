@@ -17,11 +17,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -107,25 +110,25 @@ public class MainActivity extends AppCompatActivity {
     public void selectDrawerItem(MenuItem menuItem) {
         Fragment fragment = null;
 
-        Class fragmentClass;
+        Bundle bundle=new Bundle();
         switch(menuItem.getItemId()) {
             case R.id.nav_first_fragment:
-                fragmentClass = ContentFragment.class;
+                fragment = new ContentFragment();
+                bundle.putString("url", "chapter1.html");
+                fragment.setArguments(bundle);
                 break;
             case R.id.nav_second_fragment:
-                fragmentClass = ContentFragment.class;
+                fragment = new ContentFragment();
+                bundle.putString("url", "chapter2.html");
+                fragment.setArguments(bundle);
                 break;
             case R.id.nav_third_fragment:
-                fragmentClass = ContentFragment.class;
+                fragment = new ContentFragment();
+                bundle.putString("url", "chapter3.html");
+                fragment.setArguments(bundle);
                 break;
             default:
-                fragmentClass = ContentFragment.class;
-        }
-
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+                fragment = new ContentFragment();
         }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -153,6 +156,32 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadChapter() {
+        try {
+            JSONObject obj = new JSONObject(loadJSONFromAsset());
+            JSONArray m_jArry = obj.getJSONArray("toc");
+            ArrayList<HashMap<String, String>> formList = new ArrayList<HashMap<String, String>>();
+            HashMap<String, String> list;
+
+            for (int i = 0; i < m_jArry.length(); i++) {
+                JSONObject jsonObject = m_jArry.getJSONObject(i);
+                String chapter_value = jsonObject.getString("title");
+                String url_value = jsonObject.getString("url");
+
+                list = new HashMap<String, String>();
+                list.put("title", chapter_value);
+                list.put("url", url_value);
+
+                Log.d("json object: ", jsonObject.getString("url"));
+
+                formList.add(list);
+
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

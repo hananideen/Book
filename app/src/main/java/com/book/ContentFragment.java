@@ -24,51 +24,21 @@ public class ContentFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        String url;
         WebView view = (WebView) rootView.findViewById(R.id.webView);
         view.getSettings().setJavaScriptEnabled(true);
 
         try {
-            JSONObject obj = new JSONObject(loadJSONFromAsset());
-            JSONArray m_jArry = obj.getJSONArray("toc");
-            ArrayList<HashMap<String, String>> formList = new ArrayList<HashMap<String, String>>();
-            HashMap<String, String> list;
-
-            for (int i = 0; i < m_jArry.length(); i++) {
-                JSONObject jsonObject = m_jArry.getJSONObject(i);
-                String chapter_value = jsonObject.getString("title");
-                String url_value = jsonObject.getString("url");
-
-                list = new HashMap<String, String>();
-                list.put("title", chapter_value);
-                list.put("url", url_value);
-
-                Log.d("Details: ", jsonObject.getString("url"));
-
-                formList.add(list);
-
-                view.loadUrl("file:///android_asset/" + url_value);
+            Bundle bundle = this.getArguments();
+            url = bundle.getString("url");
+            view.loadUrl("file:///android_asset/" + url);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        catch (Exception e) {
+            url  = "chapter1.html";
+            view.loadUrl("file:///android_asset/" + url);
         }
 
         return rootView;
-    }
-
-    public String loadJSONFromAsset() {
-        String json = null;
-        try {
-            InputStream is = getActivity().getAssets().open("book.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
     }
 
 }
