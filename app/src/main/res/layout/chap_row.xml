@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:text="Chapter number here"
         android:id="@+id/tvChap"
-        android:layout_margin="18dp"
+        android:layout_margin="13dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="?attr/colorPrimary"/>
     <View
