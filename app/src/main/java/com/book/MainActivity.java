@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         preferences = getSharedPreferences("Preference", Context.MODE_PRIVATE);
 
