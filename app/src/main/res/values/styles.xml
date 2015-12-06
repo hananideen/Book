@@ -4,7 +4,7 @@
         <item name="colorPrimary">#7f7f7f</item>
         <item name="colorPrimaryDark">#272727</item>
         <item name="colorAccent">#0d0d0d</item>
-        <item name="drawerStyle">@style/DrawerIcon</item>
+        <item name="drawerArrowStyle">@style/DrawerIcon</item>
     </style>
 
     <style name="DrawerIcon" parent="Widget.AppCompat.DrawerArrowToggle">
