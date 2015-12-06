@@ -30,7 +30,7 @@ public class ContentFragment extends android.support.v4.app.Fragment {
 
         try {
             Bundle bundle = this.getArguments();
-            url = bundle.getString("url");
+            url = bundle.getString(MainActivity.URL_TAG);
             view.loadUrl("file:///android_asset/" + url);
             }
         catch (Exception e) {

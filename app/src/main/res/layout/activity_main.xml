@@ -27,6 +27,14 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="?attr/colorPrimaryDark"
-        app:menu="@menu/drawer_view"
-        app:itemTextColor="?attr/colorPrimary"/>
+        app:itemTextColor="?attr/colorPrimary">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="180dp"
+            android:id="@+id/lvChapter"/>
+
+    </android.support.design.widget.NavigationView>
+
 </android.support.v4.widget.DrawerLayout>

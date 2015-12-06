@@ -14,7 +14,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -24,10 +26,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    public static String URL_TAG = "url";
 
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
@@ -35,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private TextView tvName;
     private ImageView ivIcon;
+    private ListView lvChapter;
+    List<Chapter> ChapterList;
+    ChapterAdapter chapAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.setDrawerListener(drawerToggle);
 
         nvDrawer = (NavigationView) findViewById(R.id.nvView);
-        setupDrawerContent(nvDrawer);
 
         View header = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
         nvDrawer.addHeaderView(header);
@@ -62,12 +68,24 @@ public class MainActivity extends AppCompatActivity {
         ivIcon = (ImageView) header.findViewById(R.id.ivIcon);
         nvDrawer.inflateHeaderView(R.layout.nav_header2);
 
+        ChapterList = new ArrayList<Chapter>();
+        chapAdapter = new ChapterAdapter(this, ChapterList);
+        lvChapter = (ListView) findViewById(R.id.lvChapter);
+        lvChapter.setAdapter(chapAdapter);
+
+        lvChapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectDrawerItem(i);
+            }
+        });
+
         loadData();
+        loadChapter();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
 //        switch (item.getItemId()) {
 //            case android.R.id.home:
 //                mDrawer.openDrawer(GravityCompat.START);
@@ -92,50 +110,20 @@ public class MainActivity extends AppCompatActivity {
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
-    private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        selectDrawerItem(menuItem);
-                        return true;
-                    }
-                });
-    }
-
     private ActionBarDrawerToggle setupDrawerToggle() {
         return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
     }
 
-    public void selectDrawerItem(MenuItem menuItem) {
+    public void selectDrawerItem(int  i) {
         Fragment fragment = null;
-
         Bundle bundle=new Bundle();
-        switch(menuItem.getItemId()) {
-            case R.id.nav_first_fragment:
-                fragment = new ContentFragment();
-                bundle.putString("url", "chapter1.html");
-                fragment.setArguments(bundle);
-                break;
-            case R.id.nav_second_fragment:
-                fragment = new ContentFragment();
-                bundle.putString("url", "chapter2.html");
-                fragment.setArguments(bundle);
-                break;
-            case R.id.nav_third_fragment:
-                fragment = new ContentFragment();
-                bundle.putString("url", "chapter3.html");
-                fragment.setArguments(bundle);
-                break;
-            default:
-                fragment = new ContentFragment();
-        }
-
+        Chapter chapter = chapAdapter.getChapter(i);
+        fragment = new ContentFragment();
+        bundle.putString(URL_TAG, chapter.getUrl());
+        fragment.setArguments(bundle);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
-        menuItem.setChecked(true);
-        setTitle(menuItem.getTitle());
         mDrawer.closeDrawers();
     }
 
@@ -164,23 +152,14 @@ public class MainActivity extends AppCompatActivity {
     public void loadChapter() {
         try {
             JSONObject obj = new JSONObject(loadJSONFromAsset());
-            JSONArray m_jArry = obj.getJSONArray("toc");
-            ArrayList<HashMap<String, String>> formList = new ArrayList<HashMap<String, String>>();
-            HashMap<String, String> list;
+            JSONArray jsonArray = obj.getJSONArray("toc");
 
-            for (int i = 0; i < m_jArry.length(); i++) {
-                JSONObject jsonObject = m_jArry.getJSONObject(i);
-                String chapter_value = jsonObject.getString("title");
-                String url_value = jsonObject.getString("url");
-
-                list = new HashMap<String, String>();
-                list.put("title", chapter_value);
-                list.put("url", url_value);
-
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                Chapter chapter = new Chapter(new Json2Chapter(jsonObject));
+                ChapterList.add(chapter);
+                chapAdapter.notifyDataSetChanged();
                 Log.d("json object: ", jsonObject.getString("url"));
-
-                formList.add(list);
-
             }
         } catch (JSONException e) {
             e.printStackTrace();
