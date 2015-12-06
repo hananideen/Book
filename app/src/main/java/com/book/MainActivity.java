@@ -1,5 +1,7 @@
 package com.book;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.NavigationView;
@@ -35,6 +37,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     public static String URL_TAG = "url";
+    public static String POSITION_TAG = "position";
+    public static String PAGE_TAG = "page";
 
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
@@ -43,8 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvName;
     private ImageView ivIcon;
     private ListView lvChapter;
-    List<Chapter> ChapterList;
-    ChapterAdapter chapAdapter;
+    private List<Chapter> ChapterList;
+    private ChapterAdapter chapAdapter;
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        preferences = getSharedPreferences("Preference", Context.MODE_PRIVATE);
+        editor = preferences.edit();
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerToggle = setupDrawerToggle();
@@ -98,7 +107,27 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_previous:
-                Toast.makeText(this, "Previous page", Toast.LENGTH_SHORT).show();
+
+                String currentPage = preferences.getString(PAGE_TAG, "");
+                int page = 0;
+                try {
+                    page = Integer.parseInt(currentPage) - 1;
+                    if(page<1) {
+                        //do nothing
+                    } else {
+                        String url = "chapter" +page +".html";
+                        Fragment fragment = null;
+                        Bundle bundle = new Bundle();
+                        fragment = new ContentFragment();
+                        bundle.putString(URL_TAG, url);
+                        bundle.putInt(POSITION_TAG, page);
+                        fragment.setArguments(bundle);
+                        FragmentManager fragmentManager = getSupportFragmentManager();
+                        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+                    }
+                } catch(NumberFormatException nfe) {
+                    System.out.println("Could not parse " + nfe);
+                }
                 return true;
 
             case R.id.action_next:
@@ -133,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle=new Bundle();
         Chapter chapter = chapAdapter.getChapter(i);
         fragment = new ContentFragment();
+        bundle.putInt(POSITION_TAG, i+1);
         bundle.putString(URL_TAG, chapter.getUrl());
         fragment.setArguments(bundle);
         FragmentManager fragmentManager = getSupportFragmentManager();
