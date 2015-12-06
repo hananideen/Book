@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     private List<Chapter> ChapterList;
     private ChapterAdapter chapAdapter;
     private SharedPreferences preferences;
-    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         preferences = getSharedPreferences("Preference", Context.MODE_PRIVATE);
-        editor = preferences.edit();
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerToggle = setupDrawerToggle();
@@ -105,33 +103,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String currentPage = preferences.getString(PAGE_TAG, "");
+        int page = 0;
         switch (item.getItemId()) {
             case R.id.action_previous:
-
-                String currentPage = preferences.getString(PAGE_TAG, "");
-                int page = 0;
-                try {
-                    page = Integer.parseInt(currentPage) - 1;
-                    if(page<1) {
-                        //do nothing
-                    } else {
-                        String url = "chapter" +page +".html";
-                        Fragment fragment = null;
-                        Bundle bundle = new Bundle();
-                        fragment = new ContentFragment();
-                        bundle.putString(URL_TAG, url);
-                        bundle.putInt(POSITION_TAG, page);
-                        fragment.setArguments(bundle);
-                        FragmentManager fragmentManager = getSupportFragmentManager();
-                        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
-                    }
-                } catch(NumberFormatException nfe) {
-                    System.out.println("Could not parse " + nfe);
-                }
+                page = Integer.parseInt(currentPage) - 1;
+                btnNextPrevious(page);
                 return true;
 
             case R.id.action_next:
-                Toast.makeText(this, "Next page", Toast.LENGTH_SHORT).show();
+                page = Integer.parseInt(currentPage) + 1;
+                btnNextPrevious(page);
                 return true;
         }
         if (drawerToggle.onOptionsItemSelected(item)) {
@@ -226,4 +208,22 @@ public class MainActivity extends AppCompatActivity {
         return json;
     }
 
+    public void btnNextPrevious(int page) {
+        if(page<1) {
+        //do nothing
+        } else if(page>3) {
+            //do nothing
+        } else {
+            String url = "chapter" +page +".html";
+            Fragment fragment = null;
+            Bundle bundle = new Bundle();
+            fragment = new ContentFragment();
+            bundle.putString(URL_TAG, url);
+            bundle.putInt(POSITION_TAG, page);
+            fragment.setArguments(bundle);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        }
+
+    }
 }
